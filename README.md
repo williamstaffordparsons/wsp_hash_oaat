@@ -2,7 +2,7 @@
 © 2024 William Stafford Parsons
 
 ## About
-WSP-Hash-OAAT is a tiny 32-bit OAAT hashing algorithm as a substantial improvement to 32-bit FNV-1a and MicroOAAT.
+WSP-Hash-OAAT is a tiny 32-bit OAAT hashing algorithm as a substantial improvement to 32-bit FNV-1a, Jenkin's OAAT, MicroOAAT and MurmurOAAT.
 
 Read more [here](https://williamstaffordparsons.github.io/wsp-hash-oaat/).
 
@@ -18,8 +18,7 @@ int main(void) {
 
   while (i != 10) {
     i++;
-    printf("All-at-once result %u is 0x%08x.\n", i,
-           wsp_hash_oaat(8, (const uint8_t *) input));
+    printf("All-at-once result %u is 0x%08x.\n", i, wsp_hash_oaat(8, input));
     input[7]++;
   }
 
@@ -29,10 +28,10 @@ int main(void) {
   while (i != 10) {
     i++;
     wsp_hash_oaat_initialize(&s);
-    wsp_hash_oaat_transform(0, 8, (const uint8_t *) input, &s);
+    wsp_hash_oaat_transform(0, 8, input, &s);
     wsp_hash_oaat_finalize(&s);
     input[7]++;
-    printf("Segmented result %u is 0x%08x.\n", i, s.state);
+    printf("Segmented result %u is 0x%08x.\n", i, s.mix);
   }
 
   return 0;

@@ -1,41 +1,41 @@
 #include "wsp_hash_oaat.h"
 
-uint32_t wsp_hash_oaat(unsigned long input_count, const uint8_t *input) {
-  uint32_t _state = 1;
-  uint32_t state = 1111111111;
+uint32_t wsp_hash_oaat(const unsigned long input_count, const uint8_t *input) {
+  uint32_t mix = 1111111111;
+  uint32_t mix_offset = 1;
   unsigned long i = 0;
 
   while (i != input_count) {
-    state ^= input[i];
-    state += state << 3;
-    _state += state;
-    _state = (_state << 27) | (_state >> 5);
+    mix ^= input[i];
+    mix += mix << 3;
+    mix_offset += mix;
+    mix_offset = (mix_offset << 27) | (mix_offset >> 5);
     i++;
   }
 
-  state ^= _state;
-  state = (_state ^ state) + ((state << 10) | (state >> 22));
-  return ((_state << 27) | (_state >> 5)) + state;
+  mix ^= mix_offset;
+  mix = (mix ^ mix_offset) + ((mix << 10) | (mix >> 22));
+  return mix + ((mix_offset << 27) | (mix_offset >> 5));
 }
 
 void wsp_hash_oaat_initialize(struct wsp_hash_oaat_s *s) {
-  s->_state = 1;
-  s->state = 1111111111;
+  s->mix = 1111111111;
+  s->mix_offset = 1;
 }
 
-void wsp_hash_oaat_transform(unsigned long i, unsigned long input_count,
+void wsp_hash_oaat_transform(unsigned long i, const unsigned long input_count,
                              const uint8_t *input, struct wsp_hash_oaat_s *s) {
   while (i != input_count) {
-    s->state ^= input[i];
-    s->state += s->state << 3;
-    s->_state += s->state;
-    s->_state = (s->_state << 27) | (s->_state >> 5);
+    s->mix ^= input[i];
+    s->mix += s->mix << 3;
+    s->mix_offset += s->mix;
+    s->mix_offset = (s->mix_offset << 27) | (s->mix_offset >> 5);
     i++;
   }
 }
 
 void wsp_hash_oaat_finalize(struct wsp_hash_oaat_s *s) {
-  s->state ^= s->_state;
-  s->state = (s->_state ^ s->state) + ((s->state << 10) | (s->state >> 22));
-  s->state += (s->_state << 27) | (s->_state >> 5);
+  s->mix ^= s->mix_offset;
+  s->mix = (s->mix ^ s->mix_offset) + ((s->mix << 10) | (s->mix >> 22));
+  s->mix += (s->mix_offset << 27) | (s->mix_offset >> 5);
 }
